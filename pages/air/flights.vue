@@ -4,7 +4,7 @@
       <!-- 顶部过滤列表 -->
       <div class="flights-content">
         <!-- 过滤条件 -->
-        <div></div>
+        <FlightsFilters :data="flightsData" @setDataList="handleSetDataList" />
 
         <!-- 航班头部布局 -->
         <FlightsListHead />
@@ -19,7 +19,7 @@
           :page-sizes="[5, 10, 15, 20]"
           :page-size="pageSize"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="flightsData.total"
+          :total="flightsDataCopy.total"
         ></el-pagination>
       </div>
 
@@ -34,17 +34,27 @@
 <script>
 import FlightsListHead from "@/components/air/flightsListHead.vue";
 import Flightsitem from "@/components/air/flightsItem.vue";
+import FlightsFilters from "@/components/air/flightsFilters.vue";
 
 export default {
   components: {
     FlightsListHead,
-    Flightsitem
+    Flightsitem,
+    FlightsFilters
   },
   data() {
     return {
-      //航班总数据
+      //航班总数据    筛选是用这个数据
       flightsData: {
-        flights:[]    //给默认值防止报错
+        flights:[],    //给默认值防止报错
+        info:{},
+        options:{}
+      }, 
+       //复制一份航班总数据   把筛选过后数据放在这里
+        flightsDataCopy: {
+        flights:[],    //给默认值防止报错
+        info:{},
+        options:{}
       }, 
       // dataList: [], //航班列表数据  用来循环flightsData组件 单独出来是为了分页
       pageSize: 5, //每页的条数
@@ -57,9 +67,10 @@ export default {
       params: this.$route.query //来自URL的五个参数
     }).then(res => {
       console.log(res);
+      // 保存一份到总数据（用来筛选 把筛选出来的存到备份的数据里渲染）
       this.flightsData = res.data;
-      //   截取前五项数据
-      // this.dataList = this.flightsData.flights.slice(0, this.pageSize);
+      // 备份一份总数据用来渲染 因为是引用类型内存地址是一样的所以需要解构出来才能互不影响
+      this.flightsDataCopy ={...res.data};
     });
   },
   computed: {
@@ -67,7 +78,7 @@ export default {
     // 页面要渲染的机票列表
     //航班列表数据  用来循环flightsData组件 单独出来是为了分页
     dataList() {
-      const arr = this.flightsData.flights.slice(
+      const arr = this.flightsDataCopy.flights.slice(
         (this.pageIndex - 1) * this.pageSize,
         this.pageIndex * this.pageSize
       );
@@ -80,19 +91,15 @@ export default {
       this.pageSize = val;
       // 点击切换条数后回到第一页
       this.pageIndex = 1;
-      // 请求当前页数的数据
-      // this.dataList = this.flightsData.flights.slice(
-      //   (this.pageIndex - 1) * this.pageSize,
-      //   this.pageIndex * this.pageSize
-      // );
     },
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
       this.pageIndex = val;
-      // this.dataList = this.flightsData.flights.slice(
-      //   (this.pageIndex - 1) * this.pageSize,
-      //   this.pageIndex * this.pageSize
-      // );
+    },
+    // 接收子组件传过来的数据
+    handleSetDataList(arr){
+      console.log(arr)
+      this.flightsDataCopy.flights = arr
     }
   }
 };
