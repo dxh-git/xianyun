@@ -135,12 +135,12 @@ export default {
       // 如果是空值就不请求
       if (!value) {
         // 清空cb departCities
-        cb([])
-        this.departCities = []
+        cb([]);
+        this.departCities = [];
         return;
       }
-       // 监听输入框有值的时候重新验证表单，可以消除掉红的报错信息
-            this.$refs.form.validateField("departCity");
+      // 监听输入框有值的时候重新验证表单，可以消除掉红的报错信息
+      this.$refs.form.validateField("departCity");
       // 请求value相关的城市
       this.$axios({
         url: "/airs/city",
@@ -211,18 +211,26 @@ export default {
     handleDate(value) {},
 
     // 触发和目标城市切换时触发
-    handleReverse() {},
+    handleReverse() {
+      const { departCity, departCode, destCity, destCode } = this.form;
+      // 交叉赋值
+      this.form.destCity = departCity;
+      this.form.destCode = departCode;
+
+      this.form.departCity = destCity;
+      this.form.departCode = destCode;
+    },
 
     // 提交表单是触发
     handleSubmit() {
       this.$refs.form.validate(valid => {
         if (valid) {
           // console.log(this.form);
-          // 页面跳转 query是？后面的参数 
+          // 页面跳转 query是？后面的参数
           this.$router.push({
-            path:'/air/flights',
-            query:this.form
-          })
+            path: "/air/flights",
+            query: this.form
+          });
         } else {
           this.$message.error("请输入内容");
         }

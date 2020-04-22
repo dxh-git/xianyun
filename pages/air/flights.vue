@@ -42,8 +42,11 @@ export default {
   },
   data() {
     return {
-      flightsData: {}, //航班总数据
-      dataList: [], //航班列表数据  用来循环flightsData组件 单独出来是为了分页
+      //航班总数据
+      flightsData: {
+        flights:[]    //给默认值防止报错
+      }, 
+      // dataList: [], //航班列表数据  用来循环flightsData组件 单独出来是为了分页
       pageSize: 5, //每页的条数
       pageIndex: 1 //当前页数
     };
@@ -56,10 +59,21 @@ export default {
       console.log(res);
       this.flightsData = res.data;
       //   截取前五项数据
-      this.dataList = this.flightsData.flights.slice(0, this.pageSize);
+      // this.dataList = this.flightsData.flights.slice(0, this.pageSize);
     });
   },
-
+  computed: {
+    // 计算属性会监听函数内部所有实例(this)属性的变化
+    // 页面要渲染的机票列表
+    //航班列表数据  用来循环flightsData组件 单独出来是为了分页
+    dataList() {
+      const arr = this.flightsData.flights.slice(
+        (this.pageIndex - 1) * this.pageSize,
+        this.pageIndex * this.pageSize
+      );
+      return arr
+    }
+  },
   methods: {
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
@@ -67,18 +81,18 @@ export default {
       // 点击切换条数后回到第一页
       this.pageIndex = 1;
       // 请求当前页数的数据
-      this.dataList = this.flightsData.flights.slice(
-        (this.pageIndex - 1) * this.pageSize,
-        this.pageIndex * this.pageSize
-      );
+      // this.dataList = this.flightsData.flights.slice(
+      //   (this.pageIndex - 1) * this.pageSize,
+      //   this.pageIndex * this.pageSize
+      // );
     },
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
       this.pageIndex = val;
-      this.dataList = this.flightsData.flights.slice(
-        (this.pageIndex - 1) * this.pageSize,
-        this.pageIndex * this.pageSize
-      );
+      // this.dataList = this.flightsData.flights.slice(
+      //   (this.pageIndex - 1) * this.pageSize,
+      //   this.pageIndex * this.pageSize
+      // );
     }
   }
 };
