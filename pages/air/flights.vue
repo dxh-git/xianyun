@@ -19,7 +19,7 @@
           :page-sizes="[5, 10, 15, 20]"
           :page-size="pageSize"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="flightsDataCopy.total"
+          :total="flightsDataCopy.flights.length"
         ></el-pagination>
       </div>
 
@@ -100,6 +100,7 @@ export default {
     handleSetDataList(arr){
       console.log(arr)
       this.flightsDataCopy.flights = arr
+      this.pageIndex = 1
     }
   }
 };

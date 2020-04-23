@@ -173,8 +173,13 @@ export default {
     queryDestSearch(value, cb) {
       //   cb([{ value: 1 }, { value: 2 }, { value: 3 }]);
       if (!value) {
+        // 清空cb departCities
+        cb([]);
+        this.destCities = [];
         return;
       }
+      // 监听输入框有值的时候重新验证表单，可以消除掉红的报错信息
+      this.$refs.form.validateField("destCity");
       // 请求value相关的城市
       this.$axios({
         url: "/airs/city",
@@ -208,7 +213,10 @@ export default {
     handleDestSelect(item) {},
 
     // 确认选择日期时触发
-    handleDate(value) {},
+    handleDate(value) {
+      // 监听输入框有值的时候重新验证表单，可以消除掉红的报错信息
+      this.$refs.form.validateField("departDate");
+    },
 
     // 触发和目标城市切换时触发
     handleReverse() {

@@ -52,6 +52,7 @@
       筛选：
       <el-button type="primary" round plain size="mini" @click="handleFiltersCancel">撤销</el-button>
     </div>
+    <div>{{filter}}</div>
   </div>
 </template>
 
@@ -81,55 +82,100 @@ export default {
       ]
     };
   },
-  mounted() {
-    console.log(this.data);
+  computed: {
+    //筛选多个条件
+    filter() {
+      const arr = this.data.flights.filter(v => {
+        // 假如都满足都满足条件
+        let valid = true;
+        // 当条件（this.airport）有值的时候我们才需要判断，表示用户选择了条件
+        // 由于valid变量已经假设所有的数据都是符合条件的
+        // 所以是不符合条件的条件的航班，就把valid设置为false，最后就return出false
+        // 自然这条数据就不会加入到arr中
+        // 选择机场
+        if (this.airport && v.org_airport_name !== this.airport) {
+          valid = false;
+        }
+
+        // 选择航空公司
+        if (this.company && v.airline_name !== this.company) {
+          valid = false;
+        }
+
+        // 起飞时间
+        if (this.flightTimes) {
+          // 假设 this.flightTimes等于 6,12
+          const time = this.flightTimes.split(","); // [6, 12]
+          // 每个航班的出发时间的小时
+          const current = v.dep_time.split(":")[0];
+          if (+time[0] > +current || +current >= +time[1]) {
+            valid = false;
+          }
+        }
+        // 选择机型
+        if (this.airSize && v.plane_size !== this.airSize) {
+          valid = false;
+        }
+        // valid是true会把当前这条数据加入到新数组，如果是false就不加
+        return valid;
+      });
+      this.$emit("setDataList", arr);
+      return this.company;
+    }
   },
   methods: {
     // 选择机场时候触发
     handleAirport(value) {
-      // filter过滤满足条件的航班数据arr
-      const arr = this.data.flights.filter(v => {
-        return v.org_airport_name === value;
-      });
-      // 在子组件中使用this.@emit()触发事件时，可以通过参数传入数据   把数据arr传给父组件
-      this.$emit("setDataList", arr);
+      //   // filter过滤满足条件的航班数据arr
+      //   const arr = this.data.flights.filter(v => {
+      //     return v.org_airport_name === value;
+      //   });
+      //   // 在子组件中使用this.@emit()触发事件时，可以通过参数传入数据   把数据arr传给父组件
     },
 
     // 选择出发时间时候触发
     handleFlightTimes(value) {
-        console.log(value)
-      // filter过滤满足条件的航班数据arr
-      const arr = this.data.flights.filter(v => {
-        return +v.dep_time.split(':')[0] >= +value.split(',')[0] && 
-        +v.dep_time.split(':')[0] <=  +value.split(',')[1];
-      });
-      // 在子组件中使用this.@emit()触发事件时，可以通过参数传入数据   把数据arr传给父组件
-      this.$emit("setDataList", arr);
+      //   console.log(value);
+      //   // filter过滤满足条件的航班数据arr
+      //   const arr = this.data.flights.filter(v => {
+      //     return (
+      //       +v.dep_time.split(":")[0] >= +value.split(",")[0] &&
+      //       +v.dep_time.split(":")[0] <= +value.split(",")[1]
+      //     );
+      //   });
+      //   // 在子组件中使用this.@emit()触发事件时，可以通过参数传入数据   把数据arr传给父组件
+      //   this.$emit("setDataList", arr);
     },
 
     // 选择航空公司时候触发
     handleCompany(value) {
-      console.log(value);
-      // filter过滤满足条件的航班数据arr
-      const arr = this.data.flights.filter(v => {
-        return v.airline_name === value;
-      });
-      // 在子组件中使用this.@emit()触发事件时，可以通过参数传入数据   把数据arr传给父组件
-      this.$emit("setDataList", arr);
+      // console.log(value);
+      // // filter过滤满足条件的航班数据arr
+      // const arr = this.data.flights.filter(v => {
+      //   return v.airline_name === value;
+      // });
+      // // 在子组件中使用this.@emit()触发事件时，可以通过参数传入数据   把数据arr传给父组件
+      // this.$emit("setDataList", arr);
     },
 
     // 选择机型时候触发
     handleAirSize(value) {
-      // filter过滤满足条件的航班数据arr
-      const arr = this.data.flights.filter(v => {
-        return v.plane_size === value;
-      });
-      // 在子组件中使用this.@emit()触发事件时，可以通过参数传入数据   把数据arr传给父组件
-      this.$emit("setDataList", arr);
+      //   // filter过滤满足条件的航班数据arr
+      //   const arr = this.data.flights.filter(v => {
+      //     return v.plane_size === value;
+      //   });
+      //   // 在子组件中使用this.@emit()触发事件时，可以通过参数传入数据   把数据arr传给父组件
+      //   this.$emit("setDataList", arr);
     },
 
     // 撤销条件时候触发
-    handleFiltersCancel() {}
+    handleFiltersCancel() {
+      (this.airport = ""),
+        (this.flightTimes = ""),
+        (this.company = ""),
+        (this.airSize = ""),
+        this.$emit("setDataList", this.data.flights);
+    }
   }
 };
 </script>
